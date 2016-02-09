@@ -288,7 +288,7 @@ begin
 
   RegisterTests('Spring.Core.Logging', [
     TTestLogInsideContainer.Suite,
-    TTestLogSubResolverAndConfiguration.Suite,
+    TTestLogResolverAndConfiguration.Suite,
     TTestLoggingConfiguration.Suite,
     TTestLoggingConfigurationBuilder.Suite
   ]);
