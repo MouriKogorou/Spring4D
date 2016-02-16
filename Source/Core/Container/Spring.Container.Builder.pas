@@ -55,55 +55,48 @@ type
     property OnBuild: INotifyEvent<TComponentModel> read GetOnBuild;
   end;
 
-  TInspectorBase = class abstract(TInterfacedObject, IBuilderInspector)
-  protected
-    procedure DoProcessModel(const kernel: TKernel; const model: TComponentModel); virtual; abstract;
+  TInterfaceInspector = class(TInterfacedObject, IBuilderInspector)
   public
     procedure ProcessModel(const kernel: TKernel; const model: TComponentModel);
   end;
 
-  TInterfaceInspector = class(TInspectorBase)
-  protected
-    procedure DoProcessModel(const kernel: TKernel; const model: TComponentModel); override;
+  TLifetimeInspector = class(TInterfacedObject, IBuilderInspector)
+  public
+    procedure ProcessModel(const kernel: TKernel; const model: TComponentModel);
   end;
 
-  TLifetimeInspector = class(TInspectorBase)
-  protected
-    procedure DoProcessModel(const kernel: TKernel; const model: TComponentModel); override;
+  TComponentActivatorInspector = class(TInterfacedObject, IBuilderInspector)
+  public
+    procedure ProcessModel(const kernel: TKernel; const model: TComponentModel);
   end;
 
-  TComponentActivatorInspector = class(TInspectorBase)
-  protected
-    procedure DoProcessModel(const kernel: TKernel; const model: TComponentModel); override;
-  end;
-
-  TMemberInspector = class(TInspectorBase)
+  TMemberInspector = class(TInterfacedObject)
   protected
     procedure HandleInjectAttribute(const target: TRttiNamedObject;
       var dependency: ITarget; out argument: TValue);
   end;
 
-  TConstructorInspector = class(TMemberInspector)
-  protected
-    procedure DoProcessModel(const kernel: TKernel; const model: TComponentModel); override;
+  TConstructorInspector = class(TMemberInspector, IBuilderInspector)
+  public
+    procedure ProcessModel(const kernel: TKernel; const model: TComponentModel);
   end;
 
-  TPropertyInspector = class(TMemberInspector)
-  protected
-    procedure DoProcessModel(const kernel: TKernel; const model: TComponentModel); override;
+  TPropertyInspector = class(TMemberInspector, IBuilderInspector)
+  public
+    procedure ProcessModel(const kernel: TKernel; const model: TComponentModel);
   end;
 
-  TMethodInspector = class(TMemberInspector)
-  protected
-    procedure DoProcessModel(const kernel: TKernel; const model: TComponentModel); override;
+  TMethodInspector = class(TMemberInspector, IBuilderInspector)
+  public
+    procedure ProcessModel(const kernel: TKernel; const model: TComponentModel);
   end;
 
-  TFieldInspector = class(TMemberInspector)
-  protected
-    procedure DoProcessModel(const kernel: TKernel; const model: TComponentModel); override;
+  TFieldInspector = class(TMemberInspector, IBuilderInspector)
+  public
+    procedure ProcessModel(const kernel: TKernel; const model: TComponentModel);
   end;
 
-  TInjectionTargetInspector = class(TInspectorBase)
+  TInjectionTargetInspector = class(TInterfacedObject, IBuilderInspector)
   private
     class var
       fHasNoTargetCondition: Predicate<IInjection>;
@@ -111,17 +104,18 @@ type
   protected
     procedure CheckConstructorInjections(const kernel: TKernel; const model: TComponentModel);
     procedure CheckMethodInjections(const kernel: TKernel; const model: TComponentModel);
-    procedure DoProcessModel(const kernel: TKernel; const model: TComponentModel); override;
+  public
+    procedure ProcessModel(const kernel: TKernel; const model: TComponentModel);
   end;
 
-  TInterceptorInspector = class(TInspectorBase)
-  protected
-    procedure DoProcessModel(const kernel: TKernel; const model: TComponentModel); override;
+  TInterceptorInspector = class(TInterfacedObject, IBuilderInspector)
+  public
+    procedure ProcessModel(const kernel: TKernel; const model: TComponentModel);
   end;
 
-  TAbstractMethodInspector = class(TInspectorBase)
+  TAbstractMethodInspector = class(TInterfacedObject, IBuilderInspector)
   protected
-    procedure DoProcessModel(const kernel: TKernel; const model: TComponentModel); override;
+    procedure ProcessModel(const kernel: TKernel; const model: TComponentModel);
   end;
 
 implementation
@@ -191,22 +185,9 @@ end;
 {$ENDREGION}
 
 
-{$REGION 'TInspectorBase'}
-
-procedure TInspectorBase.ProcessModel(
-  const kernel: TKernel; const model: TComponentModel);
-begin
-  Guard.CheckNotNull(kernel, 'kernel');
-  Guard.CheckNotNull(model, 'model');
-  DoProcessModel(kernel, model);
-end;
-
-{$ENDREGION}
-
-
 {$REGION 'TLifetimeInspector'}
 
-procedure TLifetimeInspector.DoProcessModel(const kernel: TKernel;
+procedure TLifetimeInspector.ProcessModel(const kernel: TKernel;
   const model: TComponentModel);
 
   function CreateLifetimeManager(const model: TComponentModel): ILifetimeManager;
@@ -300,7 +281,7 @@ end;
 
 {$REGION 'TConstructorInspector'}
 
-procedure TConstructorInspector.DoProcessModel(
+procedure TConstructorInspector.ProcessModel(
   const kernel: TKernel; const model: TComponentModel);
 var
   predicate: Predicate<TRttiMethod>;
@@ -331,7 +312,7 @@ end;
 
 {$REGION 'TMethodInspector'}
 
-procedure TMethodInspector.DoProcessModel(const kernel: TKernel;
+procedure TMethodInspector.ProcessModel(const kernel: TKernel;
   const model: TComponentModel);
 var
   condition: Predicate<TRttiMethod>;
@@ -364,7 +345,7 @@ end;
 
 {$REGION 'TPropertyInspector'}
 
-procedure TPropertyInspector.DoProcessModel(const kernel: TKernel;
+procedure TPropertyInspector.ProcessModel(const kernel: TKernel;
   const model: TComponentModel);
 var
   condition: Predicate<TRttiProperty>;
@@ -390,7 +371,7 @@ end;
 
 {$REGION 'TFieldInspector'}
 
-procedure TFieldInspector.DoProcessModel(const kernel: TKernel;
+procedure TFieldInspector.ProcessModel(const kernel: TKernel;
   const model: TComponentModel);
 var
   condition: Predicate<TRttiField>;
@@ -415,7 +396,7 @@ end;
 
 {$REGION 'TComponentActivatorInspector'}
 
-procedure TComponentActivatorInspector.DoProcessModel(
+procedure TComponentActivatorInspector.ProcessModel(
   const kernel: TKernel; const model: TComponentModel);
 begin
   if not Assigned(model.ComponentActivator) then
@@ -442,7 +423,7 @@ begin
     end;
 end;
 
-procedure TInjectionTargetInspector.DoProcessModel(const kernel: TKernel;
+procedure TInjectionTargetInspector.ProcessModel(const kernel: TKernel;
   const model: TComponentModel);
 begin
   CheckConstructorInjections(kernel, model);
@@ -493,7 +474,7 @@ end;
 
 {$REGION 'TInterfaceInspector'}
 
-procedure TInterfaceInspector.DoProcessModel(const kernel: TKernel;
+procedure TInterfaceInspector.ProcessModel(const kernel: TKernel;
   const model: TComponentModel);
 var
   attributes: TArray<ImplementsAttribute>;
@@ -538,7 +519,7 @@ end;
 
 {$REGION 'TInterceptorInspector'}
 
-procedure TInterceptorInspector.DoProcessModel(const kernel: TKernel;
+procedure TInterceptorInspector.ProcessModel(const kernel: TKernel;
   const model: TComponentModel);
 var
   attributes: TArray<InterceptorAttribute>;
@@ -566,7 +547,7 @@ end;
 
 {$REGION 'TAbstractMethodInspector'}
 
-procedure TAbstractMethodInspector.DoProcessModel(const kernel: TKernel;
+procedure TAbstractMethodInspector.ProcessModel(const kernel: TKernel;
   const model: TComponentModel);
 
   function HasVirtualAbstractMethod(const rttiType: TRttiType): Boolean;
