@@ -31,6 +31,7 @@ interface
 uses
   Spring,
   Spring.Collections,
+  Spring.Container.Common,
   Spring.Container.Core;
 
 type
@@ -71,7 +72,11 @@ type
   ///   Activates an instance by a TActivatorDelegate delegate.
   /// </summary>
   TDelegateComponentActivator = class(TComponentActivatorBase)
+  private
+    fDelegate: TActivatorDelegate;
   public
+    constructor Create(const kernel: TKernel; const model: TComponentModel;
+      const delegate: TActivatorDelegate);
     function CreateInstance(const context: ICreationContext): TValue; override;
   end;
 
@@ -81,7 +86,6 @@ uses
   Rtti,
   SysUtils,
   TypInfo,
-  Spring.Container.Common,
   Spring.Container.ResourceStrings,
   Spring.Reflection;
 
@@ -202,12 +206,17 @@ end;
 
 {$REGION 'TDelegateComponentActivator'}
 
+constructor TDelegateComponentActivator.Create(const kernel: TKernel;
+  const model: TComponentModel; const delegate: TActivatorDelegate);
+begin
+  inherited Create(kernel, model);
+  fDelegate := delegate;
+end;
+
 function TDelegateComponentActivator.CreateInstance(
   const context: ICreationContext): TValue;
 begin
-  if not Assigned(Model.ActivatorDelegate) then
-    raise EActivatorException.CreateRes(@SActivatorDelegateExpected);
-  Result := Model.ActivatorDelegate();
+  Result := fDelegate();
   ExecuteInjections(Result, context);
 end;
 

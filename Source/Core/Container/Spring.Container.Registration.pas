@@ -159,6 +159,7 @@ uses
   SysUtils,
   TypInfo,
   Spring.Collections.Lists,
+  Spring.Container.ComponentActivator,
   Spring.Container.Resolvers,
   Spring.Container.ResourceStrings,
   Spring.Reflection;
@@ -324,20 +325,21 @@ begin
     if maxVirtualIndex < method.VirtualIndex then
       maxVirtualIndex := method.VirtualIndex;
 
-  model.ActivatorDelegate :=
-    function: TValue
-    var
-      factory: TVirtualInterface;
-      intf: IInterface;
-    begin
-      factory := TVirtualInterface.Create(model.ComponentTypeInfo, invokeEvent);
-      if TType.IsDelegate(model.ComponentTypeInfo) then
-        if maxVirtualIndex > 3 then
-          TVirtualInterfaceHack(factory).VTable[3] :=
-            TVirtualInterfaceHack(factory).VTable[maxVirtualIndex];
-      factory.QueryInterface(model.ComponentTypeInfo.TypeData.Guid, intf);
-      TValue.Make(@intf, model.ComponentTypeInfo, Result);
-    end;
+  model.ComponentActivator :=
+    TDelegateComponentActivator.Create(fKernel, model,
+      function: TValue
+      var
+        factory: TVirtualInterface;
+        intf: IInterface;
+      begin
+        factory := TVirtualInterface.Create(model.ComponentTypeInfo, invokeEvent);
+        if TType.IsDelegate(model.ComponentTypeInfo) then
+          if maxVirtualIndex > 3 then
+            TVirtualInterfaceHack(factory).VTable[3] :=
+              TVirtualInterfaceHack(factory).VTable[maxVirtualIndex];
+        factory.QueryInterface(model.ComponentTypeInfo.TypeData.Guid, intf);
+        TValue.Make(@intf, model.ComponentTypeInfo, Result);
+      end);
 end;
 
 procedure TComponentRegistry.RegisterFactory(const model: TComponentModel;
