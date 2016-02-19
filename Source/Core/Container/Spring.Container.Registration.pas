@@ -159,7 +159,7 @@ uses
   SysUtils,
   TypInfo,
   Spring.Collections.Lists,
-  Spring.Container.ComponentActivator,
+  Spring.Container.Providers,
   Spring.Container.Resolvers,
   Spring.Container.ResourceStrings,
   Spring.Reflection;
@@ -325,8 +325,8 @@ begin
     if maxVirtualIndex < method.VirtualIndex then
       maxVirtualIndex := method.VirtualIndex;
 
-  model.ComponentActivator :=
-    TDelegateComponentActivator.Create(fKernel, model,
+  model.Provider :=
+    TDelegateProvider.Create(fKernel, model,
       function: TValue
       var
         factory: TVirtualInterface;

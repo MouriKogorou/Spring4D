@@ -65,7 +65,7 @@ type
     procedure ProcessModel(const kernel: TKernel; const model: TComponentModel);
   end;
 
-  TComponentActivatorInspector = class(TInterfacedObject, IBuilderInspector)
+  TProviderInspector = class(TInterfacedObject, IBuilderInspector)
   public
     procedure ProcessModel(const kernel: TKernel; const model: TComponentModel);
   end;
@@ -124,9 +124,9 @@ uses
   Classes,
   TypInfo,
   Spring.Container.Common,
-  Spring.Container.ComponentActivator,
   Spring.Container.Injection,
   Spring.Container.LifetimeManager,
+  Spring.Container.Providers,
   Spring.Container.ResourceStrings,
   Spring.Events,
   Spring.Reflection;
@@ -394,16 +394,16 @@ end;
 {$ENDREGION}
 
 
-{$REGION 'TComponentActivatorInspector'}
+{$REGION 'TProviderInspector'}
 
-procedure TComponentActivatorInspector.ProcessModel(
+procedure TProviderInspector.ProcessModel(
   const kernel: TKernel; const model: TComponentModel);
 begin
-  if not Assigned(model.ComponentActivator) then
+  if not Assigned(model.Provider) then
     if model.ComponentType.TypeKind = tkClass then
-        model.ComponentActivator := TReflectionComponentActivator.Create(kernel, model)
-      else
-        raise EBuilderException.CreateResFmt(@SRegistrationIncomplete, [model.ComponentTypeName]);
+      model.Provider := TReflectionProvider.Create(kernel, model)
+    else
+      raise EBuilderException.CreateResFmt(@SRegistrationIncomplete, [model.ComponentTypeName]);
 end;
 
 {$ENDREGION}
