@@ -47,7 +47,7 @@ type
   public
     constructor Create(const model: TComponentModel);
     function CreateInstance: TValue; overload;
-    function CreateInstance(const context: ICreationContext): TValue; overload;
+    function CreateInstance(const context: IContext): TValue; overload;
     property Model: TComponentModel read fModel;
   end;
 
@@ -232,7 +232,7 @@ begin
 end;
 
 function TMockProvider.CreateInstance(
-  const context: ICreationContext): TValue;
+  const context: IContext): TValue;
 begin
   Result := CreateInstance;
 end;
@@ -335,7 +335,7 @@ type
   TCustomLifetimeManager = class(TInterfacedObject, ILifetimeManager)
   public
     procedure Release(const instance: TValue);
-    function Resolve(const context: ICreationContext;
+    function Resolve(const context: IContext;
       const model: TComponentModel): TValue;
   end;
 
@@ -343,7 +343,7 @@ procedure TCustomLifetimeManager.Release(const instance: TValue);
 begin
 end;
 
-function TCustomLifetimeManager.Resolve(const context: ICreationContext;
+function TCustomLifetimeManager.Resolve(const context: IContext;
   const model: TComponentModel): TValue;
 begin
   Result := TActivator.CreateInstance(model.ComponentType.AsInstance);
