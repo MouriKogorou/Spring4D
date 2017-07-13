@@ -48,7 +48,7 @@ type
   IResolver = interface;
   IDependencyResolver = interface;
   IInjection = interface;
-  IDependencyInjector = interface;
+  IInjectionBuilder = interface;
   ILifetimeManager = interface;
   IProvider = interface;
   IContainerExtension = interface;
@@ -236,7 +236,7 @@ type
 
   IInjectionList = IList<IInjection>;
 
-  IDependencyInjector = interface
+  IInjectionBuilder = interface
     ['{4627FFB4-F8D9-4A70-A281-8D323FAAA4CB}']
     function InjectConstructor(const model: TComponentModel;
       const parameterTypes: array of PTypeInfo): IInjection; overload;
@@ -362,7 +362,7 @@ type
   private
     fRegistry: IComponentRegistry;
     fBuilder: IComponentBuilder;
-    fInjector: IDependencyInjector;
+    fInjectionBuilder: IInjectionBuilder;
     fResolver: IDependencyResolver;
     fProxyFactory: IProxyFactory;
     fExtensions: IList<IContainerExtension>;
@@ -376,7 +376,7 @@ type
     procedure AddExtension(const extension: IContainerExtension);
 
     property Builder: IComponentBuilder read fBuilder;
-    property Injector: IDependencyInjector read fInjector;
+    property InjectionBuilder: IInjectionBuilder read fInjectionBuilder write fInjectionBuilder;
     property Registry: IComponentRegistry read fRegistry;
     property Resolver: IDependencyResolver read fResolver;
     property Logger: ILogger read fLogger write SetLogger;
@@ -580,7 +580,7 @@ begin
   fLogger := TNullLogger.GlobalInstance;
   fRegistry := TComponentRegistry.Create(Self);
   fBuilder := TComponentBuilder.Create(Self);
-  fInjector := TDependencyInjector.Create;
+  fInjectionBuilder := TInjectionBuilder.Create;
   fResolver := TDependencyResolver.Create(Self);
   fProxyFactory := TProxyFactory.Create(Self);
   fExtensions := TCollections.CreateInterfaceList<IContainerExtension>;
