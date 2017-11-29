@@ -137,10 +137,6 @@ type
     function AsCustom(const lifetimeManager: IInterface): TRegistration; overload;
     function AsCustom<TLifetimeManagerType: class, constructor, ILifetimeManager>: TRegistration; overload; inline;
 
-    function AsFactory(paramResolution: TParamResolution = TParamResolution.ByName): TRegistration; overload;
-    function AsFactory(const resolvedServiceName: string;
-      paramResolution: TParamResolution = TParamResolution.ByName): TRegistration; overload;
-
     function InterceptedBy(interceptorType: PTypeInfo;
       where: TWhere = TWhere.Last): TRegistration; overload;
     function InterceptedBy(const name: string;
@@ -655,20 +651,6 @@ end;
 function TRegistration.AsCustom<TLifetimeManagerType>: TRegistration;
 begin
   Result := AsCustom(TLifetimeManagerType.Create);
-end;
-
-function TRegistration.AsFactory(
-  paramResolution: TParamResolution): TRegistration;
-begin
-  Kernel.Registry.RegisterFactory(Model, paramResolution);
-  Result := Self;
-end;
-
-function TRegistration.AsFactory(const resolvedServiceName: string;
-  paramResolution: TParamResolution = TParamResolution.ByName): TRegistration;
-begin
-  Kernel.Registry.RegisterFactory(Model, resolvedServiceName, paramResolution);
-  Result := Self;
 end;
 
 procedure TRegistration.InterceptedBy(
