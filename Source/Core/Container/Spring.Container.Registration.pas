@@ -33,7 +33,9 @@ uses
   Spring,
   Spring.Collections,
   Spring.Collections.Events,
+{$IFDEF DELPHIXE}
   Spring.VirtualInterface,
+{$ENDIF}
   Spring.Container.Common,
   Spring.Container.Core;
 
@@ -150,11 +152,8 @@ type
 implementation
 
 uses
-  SysUtils,
   TypInfo,
-  Spring.Collections.Lists,
   Spring.Container.Providers,
-  Spring.Container.Resolvers,
   Spring.Container.ResourceStrings,
   Spring.Reflection;
 
