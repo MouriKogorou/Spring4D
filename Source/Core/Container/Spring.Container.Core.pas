@@ -396,13 +396,13 @@ type
     fInterceptors: IList<TInterceptorReference>;
     procedure SetRefCounting(const value: TRefCounting);
   public
-    constructor Create(const componentType: TRttiType);
+    constructor Create(const kernel: TKernel; const componentType: TRttiType);
 
     function HasService(serviceType: PTypeInfo): Boolean;
     function GetServiceName(serviceType: PTypeInfo): string;
     function GetServiceType(const serviceName: string): PTypeInfo;
 
-    property Kernel: TKernel read fKernel write fKernel;
+    property Kernel: TKernel read fKernel;
 
     property ComponentType: TRttiType read fComponentType;
     property Services: IDictionary<string, PTypeInfo> read fServices;
@@ -584,9 +584,10 @@ end;
 
 {$REGION 'TComponentModel'}
 
-constructor TComponentModel.Create(const componentType: TRttiType);
+constructor TComponentModel.Create(const kernel: TKernel; const componentType: TRttiType);
 begin
   inherited Create;
+  fKernel := kernel;
   fComponentType := componentType;
   fServices := TCollections.CreateDictionary<string, PTypeInfo>;
   fConstructorInjections := TCollections.CreateInterfaceList<IInjection>;
@@ -594,6 +595,8 @@ begin
   fPropertyInjections := TCollections.CreateInterfaceList<IInjection>;
   fFieldInjections := TCollections.CreateInterfaceList<IInjection>;
   fInterceptors := TCollections.CreateList<TInterceptorReference>;
+
+  fProvider := TReflectionProvider.Create(Self);
 end;
 
 function TComponentModel.GetServiceName(serviceType: PTypeInfo): string;

@@ -153,6 +153,7 @@ implementation
 
 uses
   TypInfo,
+  Spring.Container.LifetimeManager,
   Spring.Container.Providers,
   Spring.Container.ResourceStrings,
   Spring.Reflection;
@@ -319,7 +320,7 @@ begin
       maxVirtualIndex := method.VirtualIndex;
 
   model.Provider :=
-    TDelegateProvider.Create(fKernel, model,
+    TDelegateProvider.Create(model,
       function: TValue
       var
         factory: TVirtualInterface;
@@ -378,8 +379,7 @@ begin
   Guard.CheckNotNull(componentTypeInfo, 'componentTypeInfo');
 {$ENDIF}
 
-  Result := TComponentModel.Create(componentTypeInfo.RttiType);
-  Result.Kernel := fKernel;
+  Result := TComponentModel.Create(fKernel, componentTypeInfo.RttiType);
   fModels.Add(Result);
 end;
 

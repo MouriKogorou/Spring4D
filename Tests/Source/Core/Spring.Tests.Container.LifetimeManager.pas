@@ -68,7 +68,6 @@ type
 
   TLifetimeManagerTestCase = class abstract(TTestCase)
   protected
-    fContext: TRttiContext;
     fLifetimeManager: ILifetimeManager;
     fModel: TComponentModel;
     fProvider: TMockProvider;
@@ -129,8 +128,7 @@ uses
 procedure TLifetimeManagerTestCase.SetUp;
 begin
   inherited;
-  fContext := TRttiContext.Create;
-  fModel := TComponentModel.Create(fContext.GetType(TMockObject).AsInstance);
+  fModel := TComponentModel.Create(nil, TType.GetType(TMockObject).AsInstance);
   fProvider := TMockProvider.Create(fModel);
   fModel.Provider := fProvider;
 end;
@@ -139,7 +137,6 @@ procedure TLifetimeManagerTestCase.TearDown;
 begin
   fModel.Free;
   fProvider.Free;
-  fContext.Free;
   inherited;
 end;
 
@@ -276,7 +273,7 @@ procedure TTestRefCounting.SetUp;
 begin
   inherited;
   fContext := TRttiContext.Create;
-  fModel := TComponentModel.Create(fContext.GetType(TMockComponent).AsInstance);
+  fModel := TComponentModel.Create(nil, fContext.GetType(TMockComponent).AsInstance);
   fModel.RefCounting := TRefCounting.True;
   fProvider := TMockProvider.Create(fModel);
   fModel.Provider := fProvider;
