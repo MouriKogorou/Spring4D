@@ -6205,7 +6205,7 @@ begin
   TValue.MakeWithoutCopy(@p, typeInfo, result);
 end;
 
-function SplitString(const s, delimiter: string): TArray<string>;
+function SplitString(const s, delimiter: string): TStringDynArray;
 
   function ScanChar(const s: string; var index: Integer): Boolean;
   var
